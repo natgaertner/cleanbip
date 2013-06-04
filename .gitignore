@@ -1,0 +1,9 @@
+*.pyc
+*~
+*.swp
+ersatz
+voterfiles/
+venv/
+json
+process_units/*/
+!process_units/__init__.py

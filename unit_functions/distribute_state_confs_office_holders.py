@@ -1,4 +1,4 @@
-from config import script_settings
+from config import script_settings,office_holder_file_name,voterfile_zip_name
 import re, os,shutil
 import argparse
 
@@ -27,12 +27,12 @@ def copy_state_conf(state, election, overwrite_init):
         if os.path.exists(os.path.join(script_settings['process_units'],str(election),state,'state_conf.py')):
             os.remove(os.path.join(script_settings['process_units'],str(election),state,'state_conf.py'))
         os.link(conf_file,os.path.join(script_settings['process_units'],str(election),state,'state_conf.py'))
-        if os.path.exists(os.path.join(script_settings['process_units'],str(election),state,'voterfile.zip')):
-            os.remove(os.path.join(script_settings['process_units'],str(election),state,'voterfile.zip'))
-        os.link(voter_file,os.path.join(script_settings['process_units'],str(election),state,'voterfile.zip'))
-        if os.path.exists(os.path.join(script_settings['process_units'],str(election),state,'office_holders')):
-            os.remove(os.path.join(script_settings['process_units'],str(election),state,'office_holders'))
-        os.symlink(oh_file,os.path.join(script_settings['process_units'],str(election),state,'office_holders'))
+        if os.path.exists(os.path.join(script_settings['process_units'],str(election),state,voterfile_zip_name)):
+            os.remove(os.path.join(script_settings['process_units'],str(election),state,voterfile_zip_name))
+        os.link(voter_file,os.path.join(script_settings['process_units'],str(election),state,voterfile_zip_name))
+        if os.path.exists(os.path.join(script_settings['process_units'],str(election),state,office_holder_file_name)):
+            os.remove(os.path.join(script_settings['process_units'],str(election),state,office_holder_file_name))
+        os.symlink(oh_file,os.path.join(script_settings['process_units'],str(election),state,office_holder_file_name))
         if overwrite_init or not os.path.exists(os.path.join(script_settings['process_units'],election,state,'__init__.py')):
             write_state_init(election,state)
         """

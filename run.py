@@ -6,6 +6,9 @@ import unit_functions
 def get_args():
     parser = ArgumentParser(description='run the BIP manager.')
 
+    parser.add_argument('-d', '--districts', 
+            help="extract districts from voterfile and store in units",
+            action='store_true')
     parser.add_argument('-c', '--clean_schema', 
             help="clear everything (will reset timestamps)",
             action='store_true')
@@ -33,6 +36,8 @@ def get_args():
 def main():
     args = get_args()
 
+    if args.districts or args.all:
+        process_units.run_foreach_module(unit_functions.compress_districts)
     if args.clean_schema or args.all:
         uf.clean_schema()
     if args.partition or args.all:

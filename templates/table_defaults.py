@@ -1,4 +1,5 @@
 from utils import memoize
+from config import voterfile_delimiter
 class TableDefaultTemplate():
     def __init__(self, election_key, state_key, source_prefix=None, voter_file_location=None, candidate_file_location=None, election_file_location=None, referenda_file_location=None,office_holder_file_location=None):
         self.DEFAULT_TABLE = {
@@ -50,7 +51,7 @@ class TableDefaultTemplate():
     def specific_table(self,source,file_location):
         return dict(self.DEFAULT_TABLE.items() + {
             'filename':file_location,
-            'field_sep':'\t',
+            'field_sep':voterfile_delimiter,
             'udcs':dict(self.DEFAULT_TABLE['udcs'].items()+{'source':source}.items()),
             }.items())
 

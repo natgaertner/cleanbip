@@ -1,5 +1,48 @@
 from utils.sql_utils import conn_curs
 from config import DATABASE_CONF, SCHEMA_TABLE_DICT,SCHEMA_TABLES
+import os
+
+def compress_districts(unit):
+    from config import locality_name,precinct_name,voterfile_delimiter,reduced_voterfile_name
+    import csv
+    from utils import cut
+    from zipfile import ZipFile
+    district_names = dict((e['name_column'],set()) for e in unit.ed_defs)
+    district_names.update({locality_name:set(),precinct_name:set()})
+    vf_columns = set(['voterbase_id']+[column for column_tuple in district_names for column in column_tuple if type(column_tuple) == tuple] + [column for column in district_names if type(column) == str])
+    zfile = ZipFile(unit.UNCOMPRESSED_VOTER_FILE_ZIP_LOCATION)
+    voter_file_name = zfile.namelist()[0]
+    voter_file_full = os.path.join(unit.__path__[0],voter_file_name)
+    if not os.path.exists(voter_file_full):
+        zfile.extract(voter_file_name,unit.__path__[0])
+    column_indexes = dict((column,idx) for idx,column in enumerate(open(voter_file_full).readline().split(voterfile_delimiter)) if column in vf_columns)
+
+    extra_district_dicts = {}
+    for k,v in (getattr(unit,'EXTRA_DISTRICTS',None) or {}).iteritems():
+        edfile = os.path.join(unit.__path__[0],v['filename'])
+        edcsv = csv.reader(open(edfile),delimiter='\t')
+        edcsv.next()
+        extra_district_dicts[k]=dict((l[0],l[v['column']-1]) for l in edcsv)
+    
+    with open(os.path.join(unit.__path__[0],reduced_voterfile_name),'w') as reduced_voterfile:
+        reduced_voterfile_csv = csv.DictWriter(reduced_voterfile,fieldnames=column_indexes.keys() + extra_district_dicts.keys(),delimiter=voterfile_delimiter)
+        reduced_voterfile_csv.writeheader()
+        for i,line in enumerate(csv.DictReader(cut(voter_file_full,sorted(column_indexes.values()),voterfile_delimiter),delimiter=voterfile_delimiter)):
+            write_line = False
+            for edn,edd in extra_district_dicts.iteritems():
+                line.update({edn,edd[line['voterbase_id']]})
+            for name_columns,district_set in district_names.iteritems():
+                if type(name_columns) == tuple:
+                    name = tuple(line[nc] for nc in name_columns)
+                else:
+                    name = line[name_columns]
+                if name not in district_set:
+                    write_line = True
+                    district_set.add(name)
+            if write_line:
+                reduced_voterfile_csv.writerow(line)
+            if i % 100000 == 0:
+                print i
 
 def clean_import(unit):
     from utils.table_tools import import_table_sql,create_union_table_sql
@@ -9,10 +52,6 @@ def clean_import(unit):
             import_sql = import_table_sql(SCHEMA_TABLE_DICT[actual_table['schema_table']],actual_table)
             print import_sql
             cursor.execute(import_sql)
-        for union in unit.UNIONS:
-            cursor.execute('DROP TABLE IF EXISTS {name} CASCADE;'.format(name=union['actual_table']['import_table']))
-            union_sql = create_union_table_sql(SCHEMA_TABLE_DICT[union['actual_table']['schema_table']],union)
-            cursor.execute(union_sql)
 
 def make_ersatz_conf(unit):
     from templates.ersatz_config_template import ersatz_config_template
@@ -91,3 +130,4 @@ def get_unique_schema_to_actual(unit):
         if match_actuals:
             mapping[schema_table.name] = match_actuals[0]
     return mapping
+

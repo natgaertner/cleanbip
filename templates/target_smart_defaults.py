@@ -36,6 +36,7 @@ DEFAULT_VOTER_FILE_DISTRICTS = (
 class TargetSmartTemplate():
     def __init__(self,election_key,state_key,voter_file_location,source_prefix=None,ed_defs=(),voter_file_districts=None,table_group=None):
         self.tdt = td.TableDefaultTemplate(election_key,state_key,source_prefix,voter_file_location=voter_file_location)
+        self.VOTER_FILE_LOCATION = voter_file_location
         self.VOTER_FILE_DISTRICTS = voter_file_districts or DEFAULT_VOTER_FILE_DISTRICTS
         self.ed_defs = ed_defs + tuple(ed_def for ed_def in DEFAULT_ED_DEFS if ed_def['district_type'] in self.VOTER_FILE_DISTRICTS)
 

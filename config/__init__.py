@@ -14,9 +14,17 @@ script_settings = {
         }
 
 #VOTER_FILE_SCHEMA = os.path.join(os.environ['BMS_HOME'],'schema','ts_voter_file.sql')
+precinct_name = ('vf_county_code','vf_precinct_id','vf_precinct_name')
+locality_name = 'vf_county_name'
 HIERARCHY = ['election','state']
 timestamp_suffix = 'timestamped'
 json_location = os.path.join(os.environ['BMS_HOME'],'json')
+reduced_voterfile_name = 'vf_reduced'
+office_holder_file_name = 'office_holders'
+candidate_file_name = 'candidates'
+voterfile_zip_name = 'voterfile.zip'
+voterfile_delimiter = '\t'
+
 DATABASE_CONF = {
         'user':'postgres',
         'db':'cleanbip',

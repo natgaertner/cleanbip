@@ -1,4 +1,4 @@
-from config import script_settings
+from config import script_settings,candidate_file_name,voterfile_zip_name
 import re, os,shutil
 import argparse
 
@@ -25,10 +25,10 @@ def copy_state_conf(state, election, overwrite_init):
         os.link(ed_map_file,os.path.join(script_settings['process_units'],str(election),state,'ed_map.py'))
         os.remove(os.path.join(script_settings['process_units'],str(election),state,'state_conf.py'))
         os.link(conf_file,os.path.join(script_settings['process_units'],str(election),state,'state_conf.py'))
-        os.remove(os.path.join(script_settings['process_units'],str(election),state,'voterfile.zip'))
-        os.link(voter_file,os.path.join(script_settings['process_units'],str(election),state,'voterfile.zip'))
-        os.remove(os.path.join(script_settings['process_units'],str(election),state,'candidates'))
-        os.link(cand_file,os.path.join(script_settings['process_units'],str(election),state,'candidates'))
+        os.remove(os.path.join(script_settings['process_units'],str(election),state,voterfile_zip_name))
+        os.link(voter_file,os.path.join(script_settings['process_units'],str(election),state,voterfile_zip_name))
+        os.remove(os.path.join(script_settings['process_units'],str(election),state,candidate_file_name))
+        os.link(cand_file,os.path.join(script_settings['process_units'],str(election),state,candidate_file_name))
         if overwrite_init or not os.path.exists(os.path.join(script_settings['process_units'],election,state,'__init__.py')):
             write_state_init(election,state)
         """

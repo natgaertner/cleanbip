@@ -38,42 +38,6 @@ def update_timestamp_sql(actual_table,schema_table,partition_suffixes,timestamp_
     delete = 'delete from {table_name} where {table_name}.identifier is null or {table_name}.identifier not in (select identifier from {timestamp_table_name});'.format(table_name=table_name,timestamp_table_name=timestamp_table_name,fields=','.join(schema_table.fields.keys()))
     return update_timestamp+update_other+insert+delete
 
-
-def create_union_tables(actual_tables, table_dict, unions, connection):
-    """
-    once import tables are created, create a parent table that will be inherited by the child tables. This merges tables that have to be imported in different statements so they can be keyed together to other tables as one statement (i.e. different types of electoral districts can be merged into a single electoral_district_import union)
-    """
-    for union in unions:
-        sql = table_dict[union['schema_table']].sql_import(table, union['name'])
-        print sql
-        connection.cursor().execute(sql)
-        for c in union['components']:
-            sql = 'ALTER TABLE {name} INHERIT {parent};'.format(name=c ,parent=union['name'])
-            print sql
-            connection.cursor().execute(sql)
-
-def rekey_imports(actual_tables, unions, table_dict, connection, partition_suffixes, special_tables):
-    """
-    Clear actual schema tables then copy data over from import tables, joining on long keys to populate sequential keys. Use table class' rekey_imports function to write actual sql
-    """
-    actual_table_dict = dict([(a['import_table']['table'],a) for a in actual_tables])
-    cleared_tables = set()
-    for table in actual_tables:
-        if len(table['long_fields']) > 0:
-            if table['schema_table'] not in cleared_tables:
-                clear_sql = 'DELETE from {name}'.format(name=table['schema_table']) + ''.join('_{suffix}'.format(suffix=suffix) for suffix in partition_suffixes) + ';'
-                print clear_sql
-                connection.cursor().execute(clear_sql)
-                cleared_tables.add(table['schema_table'])
-            sql = rekey_import_sql(table_dict[table['schema_table']],table, patition_suffixes)
-            print sql
-            connection.cursor().execute(sql)
-        else:
-            sql = 'CREATE TABLE {name}'.format(name=table['schema_table']) + ''.join('_{suffix}'.format(suffix) for suffix in partition_suffixes) + ';'
-            print sql
-            connection.cursor().execute(sql)
-
-
 def create_timestamp_table_sql(schema_table,partition_suffixes,timestamp_suffix):
     sql = schema_table.sql(name_override=schema_table.name + ''.join('_{suffix}'.format(suffix=suffix) for suffix in partition_suffixes) + timestamp_suffix,temp=True)
     return sql

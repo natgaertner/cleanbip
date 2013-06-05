@@ -12,21 +12,19 @@ def copy_state_conf(state, election, overwrite_init):
     if len(oh_file) > 0 and len(voter_file) > 0:
         oh_file = os.path.join(script_settings['office_holders'],election,oh_file[0])
         voter_file = os.path.join(script_settings['voterfiles'],state,voter_file[0])
-        conf_file = os.path.join(script_settings['exception_state_configs'],election,'state_conf_template_{state}.py'.format(state=state))
-        if not os.path.exists(conf_file):
-            conf_file = os.path.join(script_settings['templates'],'state_conf_template.py')
+        conf_file = os.path.join(script_settings['exception_state_configs'],election,'state_conf_data_{state}.py'.format(state=state))
         ed_map_file = os.path.join(script_settings['exception_ed_maps'],election,'ed_map_template_{state}.py'.format(state=state))
-        if not os.path.exists(ed_map_file):
-            ed_map_file = os.path.join(script_settings['templates'],'ed_map_template.py')
 
         if not os.path.exists(os.path.join(script_settings['process_units'],str(election),state)):
             os.makedirs(os.path.join(script_settings['process_units'],str(election),state))
         if os.path.exists(os.path.join(script_settings['process_units'],str(election),state,'ed_map.py')):
             os.remove(os.path.join(script_settings['process_units'],str(election),state,'ed_map.py'))
-        os.link(ed_map_file,os.path.join(script_settings['process_units'],str(election),state,'ed_map.py'))
-        if os.path.exists(os.path.join(script_settings['process_units'],str(election),state,'state_conf.py')):
-            os.remove(os.path.join(script_settings['process_units'],str(election),state,'state_conf.py'))
-        os.link(conf_file,os.path.join(script_settings['process_units'],str(election),state,'state_conf.py'))
+        if os.path.exists(ed_map_file):
+            os.link(ed_map_file,os.path.join(script_settings['process_units'],str(election),state,'ed_map.py'))
+        if os.path.exists(os.path.join(script_settings['process_units'],str(election),state,'state_conf_data.py')):
+            os.remove(os.path.join(script_settings['process_units'],str(election),state,'state_conf_data.py'))
+        if os.path.exists(conf_file):
+            os.link(conf_file,os.path.join(script_settings['process_units'],str(election),state,'state_conf_data.py'))
         if os.path.exists(os.path.join(script_settings['process_units'],str(election),state,voterfile_zip_name)):
             os.remove(os.path.join(script_settings['process_units'],str(election),state,voterfile_zip_name))
         os.link(voter_file,os.path.join(script_settings['process_units'],str(election),state,voterfile_zip_name))

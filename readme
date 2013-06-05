@@ -1,0 +1,13 @@
+installation instructions:
+create a json directory in cleanbip
+create a voterfiles directory with subdirectories for each state abbreviation (lowercase). In each subdirectory put the voterfile for that state. (the cp_vf.py script is one example of how to do this en masse)
+create a virtual environment and install the requirements in requirements.txt
+edit bin/activate in the virtual environment to set the following environment variables:
+BMS_HOME: the root directory for cleanbip
+DROPBOX_HOME: the directory dropbox updates, synced to NOI's account
+PGPASSWORD: the password for your postgres user
+PGUSER: the user name of your postgres user
+PGDB: the name of the postgres DB you're using
+run a script to create process units. unit_functions/distribute_state_confs_office_holders.py is an example of how to do this. It creates an election/state folder in process_units. In the state folder, it creates an __init__.py from templates/unit_init.py, and links candidate/office_holder, voterfile, ed_map, and state_conf_data files.
+run run.py -d to unzip the voterfile, compress it down to unique district lines, and create the districts.py file used by ed_map
+run run.py -a to build everything from scratch

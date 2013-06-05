@@ -6,10 +6,13 @@ import unit_functions
 def get_args():
     parser = ArgumentParser(description='run the BIP manager.')
 
-    parser.add_argument('-d', '--districts', 
+    parser.add_argument('-d', '--districts',
             help="extract districts from voterfile and store in units",
             action='store_true')
-    parser.add_argument('-c', '--clean_schema', 
+    parser.add_argument('-rv', '--remove_voterfile',
+            help="remove unzipped voterfile post district processing",
+            action='store_true')
+    parser.add_argument('-c', '--clean_schema',
             help="clear everything (will reset timestamps)",
             action='store_true')
     parser.add_argument('-p', '--partition',
@@ -36,8 +39,8 @@ def get_args():
 def main():
     args = get_args()
 
-    if args.districts or args.all:
-        process_units.run_foreach_module(unit_functions.compress_districts)
+    if args.districts:
+        process_units.run_foreach_module(unit_functions.compress_districts,remove_voterfile=args.remove_voterfile)
     if args.clean_schema or args.all:
         uf.clean_schema()
     if args.partition or args.all:

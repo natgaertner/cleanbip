@@ -19,28 +19,19 @@ class EdMapTemplate():
 
     def __init__(self,districts,county_school_district_flag,county_judicial_district_flag):
         self.d_dict = defaultdict(lambda:[],districts.__dict__)
-        self.judicial_district = self.d_dict['judicial_district']
-        self.county_council = self.d_dict['county_council']
-        self.congressional_district = self.d_dict['congressional_district']
-        self.state_senate_district = self.d_dict['state_senate_district']
-        self.state_rep_district = self.d_dict['state_rep_district']
-        self.school_district = self.d_dict['school_district']
-        self.county_school_district = self.d_dict['county_school_district']
-        self.county_id = self.d_dict['county_id']
-        self.state = districts.state
         self.district_patterns = dict(EdMapTemplate.district_patterns)
 
     def ed_map(self,ed):
         best_match = self.best_matches(ed)[-1]
         if best_match[2]+best_match[4] > .90:
-            return best_match[3],best_match[0],ed_concat(best_match[3],best_match[0])[0],True
+            return best_match[3],best_match[0],ed_concat(merge_name(best_match[3]),best_match[0])[0],True
         else:
             return ed,'',ed_concat(ed,'')[0],False
 
     def best_matches(self,ed):
         ed = ed.lower()
         best_matches = [(name,)+max([(p,difflib.SequenceMatcher(None,ed,p.lower())) for p in patterns],key=lambda (p,seq):seq.ratio()) for name,patterns in EdMapTemplate.district_patterns.items()]
-        best_matches = [(name,p,seq.ratio())+max([(d,score_non_matching(ed,p,seq.get_matching_blocks(),d.lower())) for d in self.d_dict[name]]+[(None,0)],key=lambda (d,score):score) for name,p,seq in best_matches]
+        best_matches = [(name,p,seq.ratio())+max([(d,score_non_matching(ed,p,seq.get_matching_blocks(),merge_name(d).lower())) for d in self.d_dict[name]]+[(None,0)],key=lambda (d,score):score) for name,p,seq in best_matches]
         best_matches = sorted(best_matches,key=lambda (name,max_pattern,score,max_dist,dist_score):score+dist_score)
         return best_matches
 
@@ -63,3 +54,9 @@ def non_matching_blocks(a,b,matching_blocks):
         start_a = mb[0]+mb[2]
         start_b = mb[1]+mb[2]
     return non_matching_a,non_matching_b
+
+def merge_name(name):
+    if type(name)==tuple:
+        return ''.join(name)
+    else:
+        return name

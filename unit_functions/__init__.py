@@ -2,7 +2,7 @@ from utils.sql_utils import conn_curs
 from config import DATABASE_CONF, SCHEMA_TABLE_DICT,SCHEMA_TABLES
 import os
 
-def compress_districts(unit):
+def compress_districts(unit,remove_voterfile=False):
     from config import locality_name,precinct_name,voterfile_delimiter,reduced_voterfile_name
     import csv
     from utils import cut
@@ -23,7 +23,7 @@ def compress_districts(unit):
         edcsv = csv.reader(open(edfile),delimiter='\t')
         edcsv.next()
         extra_district_dicts[k]=dict((l[0],l[v['column']-1]) for l in edcsv)
-    
+
     with open(os.path.join(unit.__path__[0],reduced_voterfile_name),'w') as reduced_voterfile:
         reduced_voterfile_csv = csv.DictWriter(reduced_voterfile,fieldnames=column_indexes.keys() + extra_district_dicts.keys(),delimiter=voterfile_delimiter)
         reduced_voterfile_csv.writeheader()
@@ -43,6 +43,14 @@ def compress_districts(unit):
                 reduced_voterfile_csv.writerow(line)
             if i % 100000 == 0:
                 print i
+    if remove_voterfile:
+        os.remove(voter_file_full)
+    with open(os.path.join(unit.__path__[0],'districts.py'),'w') as districts_file:
+        districts_file.write('state="{state}"\n'.format(state=unit.state_key))
+        for ed in unit.ed_defs:
+            districts_file.write(ed['district_type']+'='+str(district_names[ed['name_column']])+'\n')
+    unit.unit_post_district_trigger()
+
 
 def clean_import(unit):
     from utils.table_tools import import_table_sql,create_union_table_sql

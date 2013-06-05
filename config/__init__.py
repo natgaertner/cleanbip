@@ -8,8 +8,8 @@ script_settings = {
         'candidates':os.path.join(os.environ['DROPBOX_HOME'],'BIP Production','candidates'),
         'office_holders':os.path.join(os.environ['DROPBOX_HOME'],'noBIP','office_holders'),
         'voterfiles':os.path.join(os.environ['BMS_HOME'],'voterfiles'),
-        'voterfile_pattern':r'TS_Google.*\.txt',
-        'compressed_voterfile_pattern':r'TS_Google.*\.zip',
+        'voterfile_pattern':r'TS_Google.*\.txt$',
+        'compressed_voterfile_pattern':r'TS_Google.*\.zip$',
         'process_units':os.path.join(os.environ['BMS_HOME'],'process_units'),
         }
 
@@ -26,8 +26,8 @@ voterfile_zip_name = 'voterfile.zip'
 voterfile_delimiter = '\t'
 
 DATABASE_CONF = {
-        'user':'postgres',
-        'db':'cleanbip',
+        'user':os.environ['PGUSER'],
+        'db':os.environ['PGDB'],
         'pw':os.environ['PGPASSWORD']
         }
 SCHEMA_FILE = os.path.join(os.environ['BMS_HOME'],'config','office_holder_schema.sql')

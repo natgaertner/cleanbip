@@ -1,4 +1,3 @@
-import districts
 import os,imp,re,sys
 if os.path.exists(os.path.join(__path__[0],'state_conf_data.py')):
     state_conf_data = imp.load_module('state_conf_data',*imp.find_module('state_conf_data',__path__))
@@ -18,3 +17,13 @@ sct = StateConfTemplate(sys.modules[__name__],getattr(state_conf_data,'ed_defs',
 for attr in dir(sct):
     if not attr.startswith('__'):
         setattr(sys.modules[__name__],attr,getattr(sct,attr))
+
+def unit_post_district_trigger():
+    setattr(sys.modules[__name__],'districts',imp.load_module('districts',*imp.find_module('districts',__path__)))
+    sct.post_district_trigger(sys.modules[__name__])
+    for attr in dir(sct):
+        if not attr.startswith('__'):
+            setattr(sys.modules[__name__],attr,getattr(sct,attr))
+
+if os.path.exists(os.path.join(__path__[0],'districts.py')):
+    unit_post_district_trigger()

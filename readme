@@ -1,6 +1,8 @@
 installation instructions:
 create a json directory in cleanbip
 create a voterfiles directory with subdirectories for each state abbreviation (lowercase). In each subdirectory put the voterfile for that state. (the cp_vf.py script is one example of how to do this en masse)
+checkout ersatz from https://github.com/natgaertner/ersatzpg
+ersatz will install with ersatz.py inside ersatzpg/ersatzpg. link the inner ersatzpg directory to a symlink called ersatz in the cleanbip root
 create a virtual environment and install the requirements in requirements.txt
 edit bin/activate in the virtual environment to set the following environment variables:
 BMS_HOME: the root directory for cleanbip

@@ -31,7 +31,7 @@ class TableDefaultTemplate():
 
     @memoize('DEFAULT_CANDIDATE_TABLE')
     def default_candidate_table(self,source='_ca',file_location=None):
-        return self.specific_table((self.source_prefix or '') + source,file_location or self.candidate_file_location)
+        return self.specific_table((self.source_prefix or '') + source,file_location or self.candidate_file_location,',')
 
     @memoize('DEFAULT_OFFICE_HOLDER_TABLE')
     def default_office_holder_table(self,file_location=None):
@@ -42,16 +42,16 @@ class TableDefaultTemplate():
 
     @memoize('DEFAULT_REFERENDA_TABLE')
     def default_referenda_table(self,file_location=None):
-        return self.specific_table('referenda',file_location or self.referenda_file_location)
+        return self.specific_table('referenda',file_location or self.referenda_file_location,',')
 
     @memoize('DEFAULT_ELECTION_TABLE')
     def default_election_table(self,source='_elec',file_location=None):
         return self.specific_table((self.source_prefix or '') + source,file_location or self.election_file_location)
 
-    def specific_table(self,source,file_location):
+    def specific_table(self,source,file_location,field_sep=voterfile_delimiter):
         return dict(self.DEFAULT_TABLE.items() + {
             'filename':file_location,
-            'field_sep':voterfile_delimiter,
+            'field_sep':field_sep,
             'udcs':dict(self.DEFAULT_TABLE['udcs'].items()+{'source':source}.items()),
             }.items())
 
